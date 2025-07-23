@@ -99,12 +99,60 @@ for i = 0, 100 do
     wait(0.4)
 end
 
--- Stop music and hide loading UI
+-- Stop music
 sound:Stop()
+
+-- Hide loading elements
 outerBar.Visible = false
 percentText.Visible = false
 sub.Visible = false
 title.Visible = false
+
+-- Error message label
+local errorLabel = Instance.new("TextLabel")
+errorLabel.Size = UDim2.new(1, 0, 0, 50)
+errorLabel.Position = UDim2.new(0, 0, 0.45, 0)
+errorLabel.BackgroundTransparency = 1
+errorLabel.Text = "⚠️ Loading screen failed to load."
+errorLabel.TextColor3 = Color3.new(1, 0.3, 0.3)
+errorLabel.TextScaled = true
+errorLabel.Font = Enum.Font.GothamBold
+errorLabel.Parent = bg
+
+-- Copy link button
+local copyButton = Instance.new("TextButton")
+copyButton.Size = UDim2.new(0, 240, 0, 40)
+copyButton.Position = UDim2.new(0.5, -120, 0.55, 0)
+copyButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+copyButton.Text = "📋 Copy link for help"
+copyButton.TextColor3 = Color3.new(0, 0, 0)
+copyButton.TextScaled = true
+copyButton.Font = Enum.Font.GothamBold
+copyButton.Parent = bg
+copyButton.AutoButtonColor = true
+copyButton.BorderSizePixel = 0
+copyButton.BackgroundTransparency = 0.1
+copyButton.AnchorPoint = Vector2.new(0.5, 0)
+
+-- Rounded corners for button
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = copyButton
+
+-- Clipboard copy function for the Discord invite link
+local inviteLink = "https://discord.gg/seVr3SaW7x" -- Your Discord invite here
+copyButton.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard(inviteLink)
+    elseif toclipboard then
+        toclipboard(inviteLink)
+    else
+        warn("Clipboard function not supported in this environment.")
+    end
+    copyButton.Text = "✅ Link copied!"
+    wait(2)
+    copyButton.Text = "📋 Copy link for help"
+end)
 
 -- Error message label
 local errorLabel = Instance.new("TextLabel")
